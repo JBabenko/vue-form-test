@@ -1,32 +1,32 @@
 <template>
   <validation-provider
     tag="div"
-    class="v-input"
+    class="v-textarea"
     :name="name || label"
     :rules="rules"
     v-slot="{ errors }"
   >
     <label
-      class="v-input__label"
+      class="v-textarea__label"
       :for="`input-${id}`"
       v-text="label"
     />
-    <input
-      class="v-input__input"
+    <textarea
+      class="v-textarea__input"
       :id="`input-${id}`"
-      :type="type"
       :value="value"
       :placeholder="placeholder"
       :disabled="disabled"
+      :rows="rows"
       @input="onInput($event.target.value)"
-    >
+    />
     <span>{{ errors[0] }}</span>
   </validation-provider>
 </template>
 
 <script>
 export default {
-  name: 'VInput',
+  name: 'VTextarea',
   props: {
     value: {
       type: String,
@@ -48,9 +48,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    type: {
-      type: String,
-      default: 'text',
+    rows: {
+      type: [String, Number],
+      default: '2',
     },
     rules: {
       type: [String, Object],
@@ -74,7 +74,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.v-input {
+.v-textarea {
   &__label {
     display: block;
     font-weight: 600;

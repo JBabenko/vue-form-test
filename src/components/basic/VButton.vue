@@ -1,9 +1,10 @@
 <template>
   <button
     class="v-button"
-    :class="{ 'v-button_disabled': disabled }"
-    v-text="text"
-    @click="$emit('click')"
+    :class="{ 'v-button_disabled': disabled || loading }"
+    :disabled="disabled"
+    v-text="loading ? 'Отправка...' : text"
+    @click="onClick"
   />
 </template>
 
@@ -18,6 +19,21 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  watch: {
+    disabled(val) {
+      this.$emit('toggleDisabled', val);
+    },
+  },
+  methods: {
+    onClick() {
+      if (this.disabled) return;
+      this.$emit('click');
     },
   },
 };

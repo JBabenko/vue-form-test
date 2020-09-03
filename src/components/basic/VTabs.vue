@@ -5,7 +5,7 @@
       :key="tab.value"
       class="v-tabs__item"
       :class="{ 'v-tabs__item_selected': tab.value === value }"
-      @click="$emit('input', tab.value)"
+      @click="onClickTab(tab)"
       v-text="tab.text"
     />
   </ul>
@@ -22,6 +22,16 @@ export default {
     items: {
       type: Array,
       required: true,
+    },
+    changeOnClick: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  methods: {
+    onClickTab(tab) {
+      if (!this.changeOnClick) return;
+      this.$emit('input', tab.value);
     },
   },
 };

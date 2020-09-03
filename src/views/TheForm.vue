@@ -3,10 +3,23 @@
     <v-tabs
       v-model="activeFormTab"
       :items="formTabs"
+      :change-on-click="canChangeTab"
     />
-    <component
-      :is="`Form${activeFormTab}`"
+    <form-basic
+      v-show="activeFormTab === 'basic'"
+      ref="formBasic"
+      @changeValidity="isBasicValid = $event"
+      @submit="activeFormTab = 'address'"
     />
+    <form-address
+      v-if="activeFormTab === 'address'"
+      ref="formAddress"
+      :loading="loading"
+      @submit="onSubmit"
+    />
+    <v-modal v-model="isModalVisible">
+      {{ modalMessage }}
+    </v-modal>
   </div>
 </template>
 
@@ -22,18 +35,55 @@ export default {
   },
   data() {
     return {
-      activeFormTab: 'Basic',
+      activeFormTab: 'basic',
       formTabs: [
         {
           text: 'Основные данные',
-          value: 'Basic',
+          value: 'basic',
         },
         {
           text: 'Адрес доставки',
-          value: 'Address',
+          value: 'address',
         },
       ],
+      isBasicValid: false,
+      modalMessage: '',
+      isModalVisible: false,
+      loading: false,
     };
+  },
+  computed: {
+    canChangeTab() {
+      return this.isBasicValid;
+    },
+  },
+  methods: {
+    async onSubmit() {
+      const { formBasic, formAddress } = this.$refs;
+      const payload = { ...formBasic.formData, ...formAddress.formData };
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://craniomed.ru/test/test.php', true);
+      xhr.send(JSON.stringify(payload));
+      this.loading = true;
+      xhr.onload = () => {
+        this.loading = false;
+        const { success } = JSON.parse(xhr.response);
+        if (success) {
+          this.modalMessage = 'Успешно отправлено';
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        } else {
+          this.modalMessage = 'Ошибка! Просьба повторить запрос позже';
+          setTimeout(() => {
+            this.isModalVisible = false;
+          }, 3000);
+        }
+
+        this.isModalVisible = true;
+      };
+    },
   },
 };
 </script>
@@ -55,7 +105,6 @@ export default {
   }
 
   &__field {
-    flex-grow: 0.45;
     margin-bottom: 16px;
   }
 }
